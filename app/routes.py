@@ -186,3 +186,13 @@ def htmlDateMenu(language, day, month, year):
 def htmlNextMeal(language, days):
   date = nextMealDate(days)
   return htmlMenu(language, date)
+
+@app.errorhandler(404)
+def not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    # note that we set the 404 status explicitly
+    return render_template('500.html'), 500
