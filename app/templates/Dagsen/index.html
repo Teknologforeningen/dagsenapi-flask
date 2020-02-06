@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>TäffäAPI</title>
+</head>
+<body>
+	<h1>Täffä API</h1>
+
+	<p>This API serves the current menu for the lunch restaurant at Teknologforeningen.</p>
+
+	<h2>Usage:</h2>
+
+	<p>Use http to get the menu. The address is defined as:</p>
+        <p>http://{{ hostname }}/taffa/{language}/{URI}/</p>
+
+        <p>Possible languages are:</p>
+        <ul>
+                <li>sv</li>
+                <li>fi</li>
+                <li>en</li>
+        </ul>
+
+	<p>URIs</p>
+	<table border="1" cellpadding="5" cellspacing="0">
+		<tr>
+			<td>Method</td>
+			<td>URI</td>
+			<td>Return type</td>
+			<td>Description</td>
+		</tr>
+		<tr>
+			<td>GET</td>
+			<td>today</td>
+			<td>Text</td>
+			<td>Returns a text only version of today's lunch. Shows monday's food on weekends.</td>
+		</tr>
+		<tr>
+			<td>GET</td>
+			<td>{day}/{month}/{year}</td>
+			<td>Text</td>
+			<td>Returns the menu for the specified date if menu is known.</td>
+		</tr>
+		<tr>
+			<td>GET</td>
+			<td>{days}</td>
+			<td>Text</td>
+			<td>Returns the menu for today + {days}. So today=0, tomorrow=1 etc.<br>Saturdays and Sundays are ignored.
+days <= 5</td>
+		</tr>
+ 		<tr>
+                        <td>GET</td>
+                        <td>html/{days}</td>
+                        <td>HTML</td>
+                        <td>Menu X days from now in html form.</td>
+                </tr>
+                <tr>
+                        <td>GET</td>
+                        <td>html/week</td>
+                        <td>HTML</td>
+                        <td>Menu for the next five days in html.</td>
+                </tr>
+
+	</table>
+	
+	<p>So, to get today's menu in English you'd use the address:<br>
+	http://{{ hostname }}/taffa/en/today/</p>
+	
+</body>
+</html>

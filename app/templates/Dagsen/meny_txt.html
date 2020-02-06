@@ -1,0 +1,29 @@
+{% for weekday in week %}
+<h3>{{ weekday.dayname }}  {{ weekday.date }}</h3>
+<ul>
+{% if weekday.main != None %}
+<li>{{ weekday.main }}</li>
+{% endif %}
+
+{% if weekday.vegetarian != None %}
+<li>{{ weekday.vegetarian }}</li>
+{% endif %}
+
+{% if weekday.salad != None %}
+<li>{{ weekday.salad }}</li>
+{% endif %}
+
+{% if weekday.soup != None %}
+<li>{{ weekday.soup }}</li>
+{% endif %}
+
+{% if weekday.alacarte != None %}
+<li>{{ weekday.alacarte }}</li>
+{% endif %}
+
+{% if weekday.extra != None %}
+<li>{{ weekday.extra }}</li>
+{% endif %}
+
+</ul>
+{% endfor %}
