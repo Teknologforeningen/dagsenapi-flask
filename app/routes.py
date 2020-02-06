@@ -3,6 +3,7 @@ from app.settings import MYSQL_SERVER, MYSQL_USER, MYSQL_PASS, MYSQL_DB, MYSQL_P
 from flask import Response, request, render_template
 import datetime
 import mysql.connector
+import json
 
 sv = [' ', u'Måndag', u'Tisdag', u'Onsdag', u'Torsdag', u'Fredag', u'Lördag', u'Söndag']
 en = [' ', u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
@@ -42,17 +43,16 @@ WHERE A.matratts_id=B.matratts_id AND B.matratts_typ=D.matratts_typ_id AND datum
   return result
 
 #APIns framsida
-@app.route('/')
-@app.route('/index')
+@app.route('/taffa/')
 def index():
   return render_template('Dagsen/index.html', hostname=request.host)
   
 #Metametod för default meny
-@app.route('/<language>/<day>/<month>/<year>/')
+@app.route('/taffa/<language>/<day>/<month>/<year>/')
 def defaultMenu(language, day, month, year):
   return textMenu(language, day, month, year)
 
-@app.route('/<language>/txt/<day>/<month>/<year>/')
+@app.route('/taffa/<language>/txt/<day>/<month>/<year>/')
 def textMenu(language, day, month, year):
   menu = mySQL(language, int(day), int(month), int(year))
   output = ""
@@ -63,16 +63,16 @@ def textMenu(language, day, month, year):
   for line in menu:
     output += "%s\r\n" % line[0]
 
-  return Response(unicode(output, 'iso8859_15'), mimetype="text/plain; charset=utf-8")
+  return Response(output, mimetype="text/plain; charset=utf-8")
   
-@app.route('/<language>/today/')
+@app.route('/taffa/<language>/today/')
 def textToday(language):
   #date = datetime.date.today()
   return textPlusMeals(language, 0)
 
 #Returnerar den N:nte nästa menyn (0=idag, 1=imorgon osv.)
 # N max = 5 (lördag och söndag visas inte)
-@app.route('/<language>/<days>/')
+@app.route('/taffa/<language>/<int:days>/')
 def textPlusMeals(language, days):
   date = nextMealDate(days) 
   return textMenu(language, date.day, date.month, date.year)
@@ -90,7 +90,7 @@ def nextMealDate(days):
 
   return datum
 
-@app.route('/<language>/json/<day>/<month>/<year>/')
+@app.route('/taffa/<language>/json/<day>/<month>/<year>/')
 def jsonDateMenu(language, day, month, year):
   date = datetime.date(int(year), int(month), int(day))
   return jsonMenu(language, date)
@@ -112,7 +112,7 @@ def jsonDictionary(language, date):
     obj["extra"] = "No menu available"
     return obj
   elif len(menu) == 1:
-    obj["extra"] = unicode(menu[0][0], 'iso8859_15')
+    obj["extra"] = menu[0][0]
     return obj
 
   fields = ['main', 'vegetarian','salad','soup','alacarte','extra']
@@ -120,7 +120,7 @@ def jsonDictionary(language, date):
   i = 0
   for field in fields:
     try:
-      obj[field] = unicode(menu[i][0], 'iso8859_15')
+      obj[field] = menu[i][0]
     except:
       obj[field] = ''
 
@@ -131,26 +131,26 @@ def jsonDictionary(language, date):
 
   return obj
 
-@app.route('/<language>/json/<days>/')
+@app.route('/taffa/<language>/json/<int:days>/')
 def jsonNextMeal(language, days):
   date = nextMealDate(days)
   return jsonMenu(language, date)
 
-@app.route('/<language>/json/today/')
+@app.route('/taffa/<language>/json/today/')
 def jsonToday(language):
   today = datetime.date.today()
   return jsonMenu(language, today)
 
-@app.route('/<language>/json/week/')
+@app.route('/taffa/<language>/json/week/')
 def jsonWeek(language):
   week = []
   for i in range(0, 5):
     day = nextMealDate(i)
     week.append(jsonDictionary(language, day))
-  response = json.dumps(week, ensure_ascii=False, encoding='utf8')
+  response = json.dumps(week)
   return Response(response, mimetype='application/json; charset=utf-8')
 
-@app.route('/<language>/html/week/')
+@app.route('/taffa/<language>/html/week/')
 def htmlWeek(language):
   week = []
   for i in range(0, 5):
@@ -173,16 +173,16 @@ def htmlMenu(language, day):
   week.append(jsonDictionary(language, day))
   return render_template("Dagsen/meny.html", week=week)
 
-@app.route('/<language>/html/today/')
+@app.route('/taffa/<language>/html/today/')
 def htmlToday(language):
   return htmlNextMeal(language, 0)
 
-@app.route('/<language>/html/<day>/<month>/<year>/')
+@app.route('/taffa/<language>/html/<day>/<month>/<year>/')
 def htmlDateMenu(language, day, month, year):
   day = datetime.date(int(year), int(month), int(day))
   return htmlMenu(language, day)
 
-@app.route('/<language>/html/<days>/')
+@app.route('/taffa/<language>/html/<int:days>/')
 def htmlNextMeal(language, days):
   date = nextMealDate(days)
   return htmlMenu(language, date)
