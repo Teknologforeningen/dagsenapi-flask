@@ -5,14 +5,11 @@ import datetime
 import mysql.connector
 import json
 
-sv = [' ', u'Måndag', u'Tisdag', u'Onsdag', u'Torsdag', u'Fredag', u'Lördag', u'Söndag']
-en = [' ', u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
-fi = [' ', u'Maanantai', u'Tiistai', u'Keskiviikko', u'Torstai', u'Perjantai', u'Lauantai', u'Sunnuntai']
-
-days = {}
-days['sv'] = sv
-days['en'] = en
-days['fi'] = fi
+days = {
+  'sv': [' ', u'Måndag', u'Tisdag', u'Onsdag', u'Torsdag', u'Fredag', u'Lördag', u'Söndag']
+  'en': [' ', u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
+  'fi': [' ', u'Maanantai', u'Tiistai', u'Keskiviikko', u'Torstai', u'Perjantai', u'Lauantai', u'Sunnuntai']
+}
 
 #Funktionen som söker menyn från databasen
 def mySQL(language, day, month, year):
@@ -20,22 +17,22 @@ def mySQL(language, day, month, year):
   cursor = connection.cursor()
 
   if language == 'sv':
-    dblang = 'swe';
+    lang_table = 'namn_swe';
   elif language == 'fi':
-    dblang = 'fi'
+    lang_table = 'namn_fi'
   else:
-    dblang = 'eng'
+    lang_table = 'namn_eng'
 
   SQL = """
-SELECT DISTINCT CONCAT(IF(B.matratts_typ=2,'A la Carte: ',''),B.namn_%s,' ',IFNULL(specialdiet,'')) AS namn FROM tbl_dagens_meny AS A,tbl_matratts_lista AS B LEFT 
+SELECT DISTINCT CONCAT(IF(B.matratts_typ=2,'A la Carte: ',''),B.%s,' ',IFNULL(specialdiet,'')) AS namn FROM tbl_dagens_meny AS A,tbl_matratts_lista AS B LEFT 
 JOIN (SELECT matratts_id,CONCAT('(', GROUP_CONCAT(forkortning SEPARATOR ', '), ')') AS specialdiet 
 FROM tbl_specialdieter AS A,tbl_diettyper AS B 
 WHERE A.specialdiet=B.specialdiets_id AND B.hemsidan=1 
 GROUP BY matratts_id) AS C USING(matratts_id),tbl_matratts_typ AS D 
-WHERE A.matratts_id=B.matratts_id AND B.matratts_typ=D.matratts_typ_id AND datum='%s-%s-%s' ORDER BY sort_order;
-    """ % (dblang, year, month, day)
+WHERE A.matratts_id=B.matratts_id AND B.matratts_typ=D.matratts_typ_id AND datum=%s ORDER BY sort_order;
+""" % (lang_table, '%s')
 
-  cursor.execute(SQL)
+  cursor.execute(SQL, (datetime.date(year, month, day), ))
   result = cursor.fetchall()
   
   cursor.close()
@@ -43,6 +40,7 @@ WHERE A.matratts_id=B.matratts_id AND B.matratts_typ=D.matratts_typ_id AND datum
   return result
 
 #APIns framsida
+@app.route('/')
 @app.route('/taffa/')
 def index():
   return render_template('Dagsen/index.html', hostname=request.host)
