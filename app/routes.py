@@ -6,9 +6,9 @@ import mysql.connector
 import json
 
 days = {
-  'sv': [' ', u'Måndag', u'Tisdag', u'Onsdag', u'Torsdag', u'Fredag', u'Lördag', u'Söndag']
-  'en': [' ', u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday']
-  'fi': [' ', u'Maanantai', u'Tiistai', u'Keskiviikko', u'Torstai', u'Perjantai', u'Lauantai', u'Sunnuntai']
+  'sv': [' ', u'Måndag', u'Tisdag', u'Onsdag', u'Torsdag', u'Fredag', u'Lördag', u'Söndag'],
+  'en': [' ', u'Monday', u'Tuesday', u'Wednesday', u'Thursday', u'Friday', u'Saturday', u'Sunday'],
+  'fi': [' ', u'Maanantai', u'Tiistai', u'Keskiviikko', u'Torstai', u'Perjantai', u'Lauantai', u'Sunnuntai'],
 }
 
 #Funktionen som söker menyn från databasen
@@ -95,7 +95,7 @@ def jsonDateMenu(language, day, month, year):
 
 
 def jsonMenu(language, date):
-  response = json.dumps(jsonDictionary(language, date), ensure_ascii=False, encoding='utf8')
+  response = json.dumps(jsonDictionary(language, date), ensure_ascii=False)
   return Response(response, mimetype='application/json; charset:utf-8')
 
 def jsonDictionary(language, date):
