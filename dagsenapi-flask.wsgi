@@ -1,1 +1,0 @@
-from dagsenanpi-flask import app as application
